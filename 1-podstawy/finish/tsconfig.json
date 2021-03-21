@@ -19,5 +19,18 @@
     "noEmit": true,
     "jsx": "react-jsx"
   },
-  "include": ["src"]
+  "include": ["src"],
+  "plugins": [
+    {
+      "name": "typescript-plugin-css-modules",
+      "options": {
+        "classnameTransform": "camelCase",
+        "rendererOptions": {
+          "sass": {
+            "includePaths": ["shared/styles"]
+          }
+        }
+      }
+    }
+  ]
 }

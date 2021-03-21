@@ -1,7 +1,7 @@
 import React from "react";
 import ReactDOM from "react-dom";
 import reportWebVitals from "./reportWebVitals";
-import { Counter } from "./Counter";
+import { Counter } from "./components/counter/Counter";
 
 ReactDOM.render(
   <React.StrictMode>
