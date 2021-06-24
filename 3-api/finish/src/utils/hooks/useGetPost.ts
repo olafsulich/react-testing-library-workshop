@@ -11,6 +11,11 @@ const getPost = async (postId: PostId) => {
 };
 
 export const useGetPost = (postId: PostId) => {
-  const post = useQuery({ queryKey: ['post', postId], queryFn: () => getPost(postId) });
+  const post = useQuery(['post', postId], () => getPost(postId), {
+    staleTime: 0,
+    retryOnMount: false,
+    retry: false,
+    retryDelay: 0,
+  });
   return post;
 };

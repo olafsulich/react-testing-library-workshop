@@ -14,17 +14,15 @@ import { postData } from '../../data/post';
 import { Post } from './Post';
 import type { Post as PostType } from '../../utils/types';
 
-const getPostHandler = () => {
-  return rest.get<PostType>('https://jsonplaceholder.typicode.com/posts/1', (req, res, ctx) => {
+const server = setupServer(
+  rest.get<PostType>('https://jsonplaceholder.typicode.com/posts/1', (_req, res, ctx) => {
     return res(
       ctx.json({
         ...postData,
       }),
     );
-  });
-};
-
-const server = setupServer(getPostHandler());
+  }),
+);
 
 const render = (ui: ReactNode, { ...rtlOptions }: RenderOptions = {}) => {
   const queryClient = new QueryClient();
@@ -49,6 +47,26 @@ describe('Post', () => {
     await waitForElementToBeRemoved(loading).then(() => {
       const postHeading = screen.getByRole('heading', { level: 2 });
       expect(postHeading).toHaveTextContent(postData.title);
+    });
+  });
+
+  it('shows an error message when request fails', async () => {
+    server.use(
+      rest.get('https://jsonplaceholder.typicode.com/posts/1', (_req, res, ctx) => {
+        return res(ctx.status(500));
+      }),
+    );
+
+    render(<Post id={1} />);
+
+    const loading = screen.getByText(/loading/i);
+
+    expect(loading).toBeInTheDocument();
+
+    await waitForElementToBeRemoved(loading).then(() => {
+      const error = screen.getByText(/something went wrong/i);
+
+      expect(error).toBeInTheDocument();
     });
   });
 });

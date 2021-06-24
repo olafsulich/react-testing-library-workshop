@@ -13,8 +13,8 @@ import { postData } from '../../data/post';
 import { CreatePost } from './CreatePost';
 import type { Post as PostType } from '../../utils/types';
 
-const createPostHandler = () => {
-  return rest.post<PostType>('https://jsonplaceholder.typicode.com/posts/', (req, res, ctx) => {
+const server = setupServer(
+  rest.post<PostType>('https://jsonplaceholder.typicode.com/posts/', (_req, res, ctx) => {
     return res(
       ctx.json({
         userId: 1,
@@ -23,10 +23,8 @@ const createPostHandler = () => {
         body: 'description',
       }),
     );
-  });
-};
-
-const server = setupServer(createPostHandler());
+  }),
+);
 
 const render = (ui: ReactNode, { ...rtlOptions }: RenderOptions = {}) => {
   const queryClient = new QueryClient();
@@ -36,7 +34,7 @@ const render = (ui: ReactNode, { ...rtlOptions }: RenderOptions = {}) => {
   });
 };
 
-describe('Post', () => {
+describe('CreatePost', () => {
   beforeAll(() => server.listen());
   afterEach(() => server.resetHandlers());
   afterAll(() => server.close());
@@ -52,9 +50,33 @@ describe('Post', () => {
 
     expect(loading).toBeInTheDocument();
 
-    await waitForElementToBeRemoved(loading).then(async () => {
-      const successMessage = await screen.findByText(/success/i);
+    await waitForElementToBeRemoved(loading).then(() => {
+      const successMessage = screen.getByText(/success/i);
       expect(successMessage).toBeInTheDocument();
+    });
+  });
+
+  it('shows an error message when request fails', async () => {
+    server.use(
+      rest.post('https://jsonplaceholder.typicode.com/posts/', (_req, res, ctx) => {
+        return res(ctx.status(500));
+      }),
+    );
+
+    render(<CreatePost />);
+
+    const button = screen.getByRole('button', { name: /add post/i });
+
+    userEvent.click(button);
+
+    const loading = await screen.findByText(/loading/i);
+
+    expect(loading).toBeInTheDocument();
+
+    await waitForElementToBeRemoved(loading).then(() => {
+      const error = screen.getByText(/something went wrong/i);
+
+      expect(error).toBeInTheDocument();
     });
   });
 });

@@ -5,10 +5,12 @@ type PostProps = {
 };
 
 export const Post = ({ id }: PostProps) => {
-  const { isLoading, isError, data, error } = useGetPost(id);
+  const { isLoading, isSuccess, isError, data, error } = useGetPost(id);
   return (
     <>
       {isLoading ? <p>Loading...</p> : null}
+      {isError ? <p>Something went wrong</p> : null}
+      {isSuccess ? <p>Success</p> : null}
       <h2>{data?.title}</h2>
       <p>{data?.body}</p>
     </>

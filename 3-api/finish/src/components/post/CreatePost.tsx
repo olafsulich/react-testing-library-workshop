@@ -1,7 +1,7 @@
 import { useCreatePost } from '../../utils/hooks/useCreatePost';
 
 export const CreatePost = () => {
-  const { isLoading, isSuccess, mutate } = useCreatePost();
+  const { isLoading, isError, isSuccess, mutate } = useCreatePost();
 
   const handleCreatePost = () => {
     mutate({
@@ -15,6 +15,7 @@ export const CreatePost = () => {
   return (
     <>
       {isLoading ? <p>Loading...</p> : null}
+      {isError ? <p>Something went wrong</p> : null}
       {isSuccess ? <p>Success</p> : null}
       <button onClick={handleCreatePost}>Add post</button>
     </>
