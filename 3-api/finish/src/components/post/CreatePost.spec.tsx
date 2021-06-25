@@ -26,9 +26,9 @@ const server = setupServer(
   }),
 );
 
-const render = (ui: ReactNode, { ...rtlOptions }: RenderOptions = {}) => {
-  const queryClient = new QueryClient();
+const queryClient = new QueryClient();
 
+const render = (ui: ReactNode, { ...rtlOptions }: RenderOptions = {}) => {
   return rtlRender(<QueryClientProvider client={queryClient}>{ui}</QueryClientProvider>, {
     ...rtlOptions,
   });
@@ -36,7 +36,10 @@ const render = (ui: ReactNode, { ...rtlOptions }: RenderOptions = {}) => {
 
 describe('CreatePost', () => {
   beforeAll(() => server.listen());
-  afterEach(() => server.resetHandlers());
+  afterEach(() => {
+    server.resetHandlers();
+    queryClient.clear();
+  });
   afterAll(() => server.close());
 
   it('shows Success message when loading status is over', async () => {

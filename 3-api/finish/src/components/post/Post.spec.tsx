@@ -5,7 +5,6 @@ import {
   waitForElementToBeRemoved,
   RenderOptions,
 } from '@testing-library/react';
-import userEvent from '@testing-library/user-event';
 import { QueryClient, QueryClientProvider } from 'react-query';
 import { rest } from 'msw';
 import { setupServer } from 'msw/node';
@@ -24,9 +23,9 @@ const server = setupServer(
   }),
 );
 
-const render = (ui: ReactNode, { ...rtlOptions }: RenderOptions = {}) => {
-  const queryClient = new QueryClient();
+const queryClient = new QueryClient();
 
+const render = (ui: ReactNode, { ...rtlOptions }: RenderOptions = {}) => {
   return rtlRender(<QueryClientProvider client={queryClient}>{ui}</QueryClientProvider>, {
     ...rtlOptions,
   });
@@ -34,7 +33,10 @@ const render = (ui: ReactNode, { ...rtlOptions }: RenderOptions = {}) => {
 
 describe('Post', () => {
   beforeAll(() => server.listen());
-  afterEach(() => server.resetHandlers());
+  afterEach(() => {
+    server.resetHandlers();
+    queryClient.clear();
+  });
   afterAll(() => server.close());
 
   it('shows correct title when loading status is over', async () => {
@@ -65,7 +67,6 @@ describe('Post', () => {
 
     await waitForElementToBeRemoved(loading).then(() => {
       const error = screen.getByText(/something went wrong/i);
-
       expect(error).toBeInTheDocument();
     });
   });
